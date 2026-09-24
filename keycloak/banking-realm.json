@@ -1,0 +1,128 @@
+{
+  "id": "banking-realm",
+  "realm": "banking-realm",
+  "displayName": "Banking Realm",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "USER",
+        "description": "Standard banking customer / authenticated user"
+      },
+      {
+        "name": "ADMIN",
+        "description": "System administrator with full customer & account privileges"
+      },
+      {
+        "name": "MAKER",
+        "description": "Transaction maker / creator"
+      },
+      {
+        "name": "CHECKER",
+        "description": "Consent and transaction checker / approver"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "banking-client",
+      "name": "Banking Client Application",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "protocol": "openid-connect",
+      "fullScopeAllowed": true,
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "attributes": {
+        "access.token.lifespan": "3600"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "email": "admin@bank.com",
+      "firstName": "Admin",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "ADMIN",
+        "USER"
+      ]
+    },
+    {
+      "username": "maker",
+      "enabled": true,
+      "email": "maker@bank.com",
+      "firstName": "Maker",
+      "lastName": "Officer",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "maker123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "MAKER",
+        "USER"
+      ]
+    },
+    {
+      "username": "checker",
+      "enabled": true,
+      "email": "checker@bank.com",
+      "firstName": "Checker",
+      "lastName": "Manager",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "checker123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "CHECKER",
+        "USER"
+      ]
+    },
+    {
+      "username": "user",
+      "enabled": true,
+      "email": "user@bank.com",
+      "firstName": "Standard",
+      "lastName": "Customer",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "user123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER"
+      ]
+    }
+  ]
+}

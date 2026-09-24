@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaBank | Customer Registration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/login.css">
+<style>
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 600px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+.login-card.register-card {
+  width: min(520px, 100%);
+  padding: 36px;
+}
+.success-box {
+  display: none;
+  background: #edfbf4;
+  border: 1px solid #c2eed5;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  color: #176a44;
+  margin-top: 15px;
+}
+.success-box.show {
+  display: block;
+}
+.success-box h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  color: #105936;
+}
+.success-box p {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: #2b7a54;
+}
+.success-box a {
+  display: inline-block;
+  background: #176a44;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 12px;
+}
+.requirements {
+  font-size: 11px;
+  color: #7b889e;
+  margin-top: -8px;
+  margin-bottom: 14px;
+}
+</style>
+</head>
+<body>
+<div class="login-page">
+  <div class="login-visual">
+    <div class="visual-top">
+      <div class="brand"><div class="logo">N</div><span>NovaBank</span></div>
+      <div class="secure-pill">● Bank-Grade 256-bit Encryption</div>
+    </div>
+    <div class="visual-content" style="margin-top: 12vh;">
+      <span class="eyebrow">DIGITAL BANKING PORTAL</span>
+      <h1>Experience modern<br><span>financial freedom.</span></h1>
+      <p>Open your digital banking account in minutes with seamless Open Banking consent controls, verified transfers, and institutional-grade security.</p>
+      <div class="visual-stats">
+        <div><strong>Instant</strong><small>Profile Setup</small></div>
+        <div><strong>Zero</strong><small>Maintenance Fee</small></div>
+        <div><strong>24/7</strong><small>Digital Support</small></div>
+      </div>
+    </div>
+    <div class="visual-card">
+      <div class="credit-top"><span>NovaBank</span><span>VISA</span></div>
+      <div class="credit-number">•••• &nbsp; •••• &nbsp; •••• &nbsp; 8829</div>
+      <div class="credit-bottom"><span>PLATINUM MEMBER</span><span>12/30</span></div>
+    </div>
+  </div>
+
+  <div class="login-area">
+    <div class="login-card register-card">
+      <div class="mobile-brand"><div class="logo">N</div><b>NovaBank</b></div>
+      <div class="login-heading">
+        <div class="welcome-icon">📝</div>
+        <h2>Create an Account</h2>
+        <p>Enter your legal information to register for NovaBank digital banking.</p>
+      </div>
+
+      <div id="successBox" class="success-box">
+        <div style="font-size: 32px; margin-bottom: 8px;">✓</div>
+        <h3>Registration Complete!</h3>
+        <p id="successMsg">Your profile has been created. You can now log in using your registered credentials.</p>
+        <a href="index.html">Proceed to Sign In →</a>
+      </div>
+
+      <form id="registerForm">
+        <div class="field">
+          <label for="regName">Full Legal Name *</label>
+          <div class="input-box">
+            <span>👤</span>
+            <input id="regName" type="text" placeholder="e.g. Santhosh Kumar" autocomplete="name" required>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="field">
+            <label for="regEmail">Email Address *</label>
+            <div class="input-box">
+              <span>✉</span>
+              <input id="regEmail" type="email" placeholder="name@example.com" autocomplete="email" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="regPhone">Phone Number *</label>
+            <div class="input-box">
+              <span>📞</span>
+              <input id="regPhone" type="tel" placeholder="10-digit mobile" autocomplete="tel" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="regAddress">Residential Address *</label>
+          <div class="input-box">
+            <span>🏠</span>
+            <input id="regAddress" type="text" placeholder="Street, City, Postal Code" autocomplete="street-address" required>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="field">
+            <label for="regPassword">Create Password *</label>
+            <div class="input-box">
+              <span>🔒</span>
+              <input id="regPassword" type="password" placeholder="Min 6 characters" autocomplete="new-password" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="regConfirmPassword">Confirm Password *</label>
+            <div class="input-box">
+              <span>🔒</span>
+              <input id="regConfirmPassword" type="password" placeholder="Repeat password" autocomplete="new-password" required>
+            </div>
+          </div>
+        </div>
+        <div class="requirements">Password must be at least 6 characters.</div>
+
+        <button class="sign-in" id="regSubmitBtn" type="submit">
+          <span id="regBtnText">Create NovaBank Account</span>
+          <b>→</b>
+        </button>
+
+        <p id="regError" class="login-error"></p>
+
+        <div style="margin-top: 22px; text-align: center; font-size: 12px; color: #5f6d85;">
+          Already have an account? <a href="index.html" style="color: #24479c; font-weight: 700; text-decoration: none;">Sign in here</a>
+        </div>
+      </form>
+
+      <div class="security-note">
+        <span>🔒</span> Compliant with Open Banking & Data Privacy Regulations
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/register.js"></script>
+</body>
+</html>

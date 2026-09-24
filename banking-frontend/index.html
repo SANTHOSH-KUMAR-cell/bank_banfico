@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaBank | Secure Online Banking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/login.css">
+<style>
+/* Clean modal for Forgot Password */
+.info-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 23, 52, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  place-items: center;
+  padding: 20px;
+}
+.info-modal.show {
+  display: grid;
+}
+.info-box {
+  background: white;
+  border-radius: 18px;
+  max-width: 420px;
+  width: 100%;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  animation: popIn 0.25s ease-out;
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.info-box h3 {
+  margin: 0 0 10px;
+  color: #172c61;
+  font-size: 18px;
+}
+.info-box p {
+  color: #5c6a82;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0 0 20px;
+}
+.info-box button {
+  width: 100%;
+  padding: 12px;
+  background: #24479c;
+  color: white;
+  border: 0;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+<div class="login-page">
+  <div class="login-visual">
+    <div class="visual-top">
+      <div class="brand"><div class="logo">N</div><span>NovaBank</span></div>
+      <div class="secure-pill">● 256-bit Institutional Security</div>
+    </div>
+    <div class="visual-content">
+      <span class="eyebrow">DIGITAL BANKING PLATFORM</span>
+      <h1>Intelligent banking,<br><span>effortlessly secure.</span></h1>
+      <p>Access your accounts, execute secure funds transfers, and manage regulatory Open Banking consent authorizations in real-time.</p>
+      <div class="visual-stats">
+        <div><strong>256-bit</strong><small>SSL Encryption</small></div>
+        <div><strong>OAuth 2.0</strong><small>OIDC Protection</small></div>
+        <div><strong>Verified</strong><small>Maker-Checker Audit</small></div>
+      </div>
+    </div>
+    <div class="visual-card">
+      <div class="credit-top"><span>NovaBank</span><span>VISA</span></div>
+      <div class="credit-number">•••• &nbsp; •••• &nbsp; •••• &nbsp; 4521</div>
+      <div class="credit-bottom"><span>PRIMARY ACCOUNT</span><span>09/29</span></div>
+    </div>
+  </div>
+
+  <div class="login-area">
+    <div class="login-card">
+      <div class="mobile-brand"><div class="logo">N</div><b>NovaBank</b></div>
+      <div class="login-heading">
+        <div class="welcome-icon">🔒</div>
+        <h2>Sign In to NovaBank</h2>
+        <p>Enter your username or email address and password.</p>
+      </div>
+
+      <form id="loginForm">
+        <div class="field">
+          <label for="username">Username or Email</label>
+          <div class="input-box">
+            <span>👤</span>
+            <input id="username" type="text" placeholder="Enter username or email" autocomplete="username" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input-box">
+            <span>🔒</span>
+            <input id="password" type="password" placeholder="Enter password" autocomplete="current-password" required>
+            <button type="button" id="togglePassword">Show</button>
+          </div>
+        </div>
+
+        <div class="login-options">
+          <label class="remember">
+            <input type="checkbox" id="rememberMe">
+            Remember me
+          </label>
+          <a href="#" id="forgotPasswordLink">Forgot password?</a>
+        </div>
+
+        <button class="sign-in" id="submitBtn" type="submit">
+          <span id="btnText">Sign In</span>
+          <b>→</b>
+        </button>
+
+        <p id="loginError" class="login-error"></p>
+
+        <div style="margin-top: 22px; text-align: center; font-size: 13px; color: #5f6d85;">
+          Don't have an account? <a href="register.html" style="color: #24479c; font-weight: 700; text-decoration: none;">Create an account</a>
+        </div>
+      </form>
+
+      <div class="security-note">
+        <span>🔒</span> Protected by Keycloak OAuth2 / OpenID Connect Protocol
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Safe Forgot Password Modal -->
+<div id="forgotPasswordModal" class="info-modal">
+  <div class="info-box">
+    <h3>Password Recovery</h3>
+    <p>To safeguard your account against unauthorized access, password resets are processed through your organization administrator or via self-service verification through the Keycloak Account Console.</p>
+    <button type="button" id="closeForgotModal">Understood</button>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>

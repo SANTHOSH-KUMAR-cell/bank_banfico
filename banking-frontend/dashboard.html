@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaBank | Digital Banking Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/dashboard.css">
+<style>
+/* Additional UI Enhancements */
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 22px;
+}
+@media (max-width: 1100px) {
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 650px) {
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.stat-box {
+  background: white;
+  border: 1px solid #e8ebf1;
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 4px 15px rgba(20, 35, 75, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.stat-box span {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.stat-box strong {
+  font-size: 24px;
+  color: #0f172a;
+  letter-spacing: -0.5px;
+}
+.stat-box small {
+  font-size: 10px;
+  color: #94a3b8;
+}
+.stat-box.pending {
+  border-left: 4px solid #f59e0b;
+}
+.stat-box.approved {
+  border-left: 4px solid #10b981;
+}
+.stat-box.rejected {
+  border-left: 4px solid #ef4444;
+}
+.stat-box.primary-stat {
+  border-left: 4px solid #3b82f6;
+}
+
+.table-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.btn-icon {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-icon:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+.btn-icon.danger {
+  color: #dc2626;
+  background: #fef2f2;
+  border-color: #fee2e2;
+}
+.btn-icon.danger:hover {
+  background: #fee2e2;
+}
+
+/* User Profile Card */
+.profile-card {
+  background: white;
+  border: 1px solid #e8ebf1;
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 600px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+}
+.profile-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 12px;
+}
+.profile-row:last-child {
+  border-bottom: none;
+}
+.profile-row strong {
+  color: #64748b;
+  font-weight: 600;
+}
+.profile-row span {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* Confirm Dialog */
+.confirm-box {
+  text-align: center;
+}
+.confirm-box p {
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 10px 0 24px;
+}
+.confirm-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">N</div>
+      <span>NovaBank</span>
+    </div>
+    <nav id="sidebarNav">
+      <!-- Nav items populated dynamically based on role -->
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="support-box">
+        <strong>NovaBank Secure Portal</strong>
+        <span>256-Bit TLS & OAuth2 Verified</span>
+        <button id="refreshDataBtn" type="button">↻ Synchronize Data</button>
+      </div>
+      <button id="logoutBtn" class="logout" type="button">↪ <span>Sign Out</span></button>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="main">
+    <header class="topbar">
+      <button id="menuBtn" class="menu-btn" type="button">☰</button>
+      <div>
+        <div class="date" id="currentDate"></div>
+        <h2 id="pageTitle">Dashboard</h2>
+      </div>
+      <div class="profile">
+        <div class="avatar" id="avatar">U</div>
+        <div class="profile-text">
+          <strong id="profileName">Loading...</strong>
+          <span id="profileRoles">Role</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Global Alert / Feedback Banner -->
+    <div id="globalAlert" class="alert-banner">
+      <span id="alertIcon">⚠️</span>
+      <span id="alertMessage" style="flex:1"></span>
+      <button onclick="dismissAlert()" style="border:0;background:none;cursor:pointer;font-weight:bold;color:inherit" type="button">✕</button>
+    </div>
+
+    <!-- ================= 1. DASHBOARD PAGE ================= -->
+    <section class="page active" id="page-dashboard">
+      <div class="hero-row">
+        <div>
+          <span class="eyebrow" id="dashRoleEyebrow">DIGITAL BANKING PORTAL</span>
+          <h1>Welcome, <span id="welcomeName">User</span> 👋</h1>
+          <p id="dashSubheading">Real-time overview of accounts, transactions, and consent requests.</p>
+        </div>
+        <div id="dashHeaderActions">
+          <button class="primary" data-open="transfer">+ Transfer Money</button>
+        </div>
+      </div>
+
+      <!-- Role-specific stats container -->
+      <div id="roleDashboardStats"></div>
+
+      <!-- Common / Scoped Two-Column Overview -->
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h3 id="dashAccountsHeading">Accounts Overview</h3>
+              <p>Active deposit and savings accounts</p>
+            </div>
+            <button class="text-btn" data-open="accounts">View all →</button>
+          </div>
+          <div id="dashboardAccountsList">
+            <div class="loading-spinner">Loading accounts...</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Quick Actions</h3>
+              <p>Common banking operations</p>
+            </div>
+          </div>
+          <div class="quick-grid" id="dashboardQuickActions">
+            <!-- Injected by JS based on user role -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Transactions Section -->
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h3>Recent Transactions</h3>
+            <p>Latest ledger entries</p>
+          </div>
+          <button class="text-btn" data-open="transactions">View full ledger →</button>
+        </div>
+        <div class="transactions" id="dashboardRecentTxns">
+          <div class="loading-spinner">Loading activity...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 2. CUSTOMERS PAGE (ADMIN) ================= -->
+    <section class="page" id="page-customers">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">CUSTOMER DIRECTORY</span>
+          <h1>Customer Management</h1>
+          <p>Register, view, update, and manage customer records.</p>
+        </div>
+        <button class="primary" id="openAddCustomerModal">+ New Customer</button>
+      </div>
+      <div class="panel">
+        <div class="filters" style="grid-template-columns: 1fr auto; margin-bottom: 15px;">
+          <input id="customerSearchInput" placeholder="⌕ Search by name, email, phone, or address...">
+          <button class="secondary" onclick="exportCustomersCSV()">Export CSV</button>
+        </div>
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>Phone</th>
+                <th>Residential Address</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="customersTableBody">
+              <tr><td colspan="7" class="loading-spinner">Loading customers...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 3. ACCOUNTS PAGE ================= -->
+    <section class="page" id="page-accounts">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">ACCOUNT PORTFOLIO</span>
+          <h1 id="accountsPageTitle">Bank Accounts</h1>
+          <p>Deposit, checking, and savings account details.</p>
+        </div>
+        <button class="primary" id="openAddAccountModal">+ Open New Account</button>
+      </div>
+      <div class="panel" style="margin-bottom: 20px;">
+        <div class="filters" style="grid-template-columns: 2fr 1fr 1fr;">
+          <input id="accountSearchInput" placeholder="⌕ Search by account number or customer...">
+          <select id="accountTypeFilter">
+            <option value="">All Account Types</option>
+            <option value="SAVINGS">Savings Account</option>
+            <option value="CURRENT">Current Account</option>
+            <option value="SALARY">Salary Account</option>
+          </select>
+          <select id="accountStatusFilter">
+            <option value="">All Statuses</option>
+            <option value="ACTIVE">Active</option>
+            <option value="SUSPENDED">Suspended</option>
+            <option value="CLOSED">Closed</option>
+          </select>
+        </div>
+      </div>
+      <div class="accounts-grid" id="accountsGrid">
+        <div class="loading-spinner">Loading accounts...</div>
+      </div>
+    </section>
+
+    <!-- ================= 4. TRANSFER / TRANSACTIONS EXECUTION ================= -->
+    <section class="page" id="page-transfer">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">FUNDS MOVEMENT</span>
+          <h1>Execute Transfer</h1>
+          <p>Initiate credit or debit operations with transactional integrity.</p>
+        </div>
+      </div>
+      <div class="form-panel">
+        <div class="transfer-title">
+          <div class="transfer-icon">↗</div>
+          <div>
+            <h3>Account Fund Transfer</h3>
+            <p>Direct atomic posting with real-time balance arithmetic.</p>
+          </div>
+        </div>
+        <form id="transferForm">
+          <div class="form-grid">
+            <div class="field">
+              <label>Select Target Account *</label>
+              <select id="transferAccountSelect" required>
+                <option value="">Choose Account</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Transaction Type *</label>
+              <select id="transferTypeSelect" required>
+                <option value="CREDIT">CREDIT (Deposit / Increase Balance)</option>
+                <option value="DEBIT">DEBIT (Withdrawal / Decrease Balance)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Amount (₹) *</label>
+              <div class="money">
+                <span>₹</span>
+                <input id="transferAmount" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+              </div>
+            </div>
+            <div class="field">
+              <label>Payment Description / Note *</label>
+              <input id="transferDescription" placeholder="e.g. Invoice settlement, Salary, Wire transfer" required>
+            </div>
+          </div>
+          <div class="form-footer">
+            <span id="transferRoleBadge">🔒 Secure Authorization Verification</span>
+            <button class="primary" id="transferSubmitBtn" type="submit">Submit Transfer →</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================= 5. TRANSACTIONS LEDGER ================= -->
+    <section class="page" id="page-transactions">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">AUDIT TRAIL</span>
+          <h1>Transaction History</h1>
+          <p>Comprehensive transaction log with real-time status.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="filters">
+          <input id="txnSearchInput" placeholder="⌕ Search reference ID or description...">
+          <select id="txnAccountFilter">
+            <option value="">All Accounts</option>
+          </select>
+          <select id="txnTypeFilter">
+            <option value="">All Types (Credit / Debit)</option>
+            <option value="CREDIT">Credit (+)</option>
+            <option value="DEBIT">Debit (-)</option>
+          </select>
+        </div>
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Account</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Description</th>
+                <th>Date & Time</th>
+              </tr>
+            </thead>
+            <tbody id="transactionsTableBody">
+              <tr><td colspan="7" class="loading-spinner">Loading transactions...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 6. BENEFICIARIES PAGE ================= -->
+    <section class="page" id="page-beneficiaries">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">PAYEE MANAGEMENT</span>
+          <h1>Beneficiaries</h1>
+          <p>Manage external and internal recipient payees.</p>
+        </div>
+        <button id="openAddBeneficiaryModal" class="primary">+ Add Beneficiary</button>
+      </div>
+      <div class="panel" style="margin-bottom: 20px;">
+        <div class="filters" style="grid-template-columns: 1fr;">
+          <input id="beneficiarySearchInput" placeholder="⌕ Search by payee name, bank, or account number...">
+        </div>
+      </div>
+      <div class="beneficiaries" id="beneficiariesGrid">
+        <div class="loading-spinner">Loading beneficiaries...</div>
+      </div>
+    </section>
+
+    <!-- ================= 7. CONSENTS PAGE ================= -->
+    <section class="page" id="page-consents">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">OPEN BANKING</span>
+          <h1>Consent Management</h1>
+          <p>Third-Party Provider access authorization and lifecycle governance.</p>
+        </div>
+        <button id="openAddConsentModal" class="primary">+ Request New Consent</button>
+      </div>
+      <div class="panel">
+        <div class="filters" style="grid-template-columns: 2fr 1fr; margin-bottom: 16px;">
+          <input id="consentSearchInput" placeholder="⌕ Search by reference, customer, or purpose...">
+          <select id="consentStatusFilter">
+            <option value="">All Consent Statuses</option>
+            <option value="PENDING">Pending Authorization</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+          </select>
+        </div>
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Customer</th>
+                <th>Purpose / Scope</th>
+                <th>Status</th>
+                <th>Requested Date</th>
+                <th>Resolution Date</th>
+                <th>Authorization Actions</th>
+              </tr>
+            </thead>
+            <tbody id="consentsTableBody">
+              <tr><td colspan="7" class="loading-spinner">Loading consents...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 8. USERS & ROLES PAGE (ADMIN) ================= -->
+    <section class="page" id="page-users">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">IDENTITY & ACCESS</span>
+          <h1>System Users & Roles</h1>
+          <p>Registered banking operators, customers, and administrative permissions.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Username / Email</th>
+                <th>Display Name</th>
+                <th>Assigned Roles</th>
+                <th>Status</th>
+                <th>Registered Since</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="5" class="loading-spinner">Loading users...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 9. PROFILE PAGE ================= -->
+    <section class="page" id="page-profile">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">ACCOUNT INFORMATION</span>
+          <h1>My Profile</h1>
+          <p>Personal profile, active credentials, and session permissions.</p>
+        </div>
+      </div>
+      <div class="profile-card">
+        <div class="profile-row">
+          <strong>Full Display Name</strong>
+          <span id="profDetailName">-</span>
+        </div>
+        <div class="profile-row">
+          <strong>Username / Email</strong>
+          <span id="profDetailUsername">-</span>
+        </div>
+        <div class="profile-row">
+          <strong>Assigned Roles</strong>
+          <span id="profDetailRoles">-</span>
+        </div>
+        <div class="profile-row">
+          <strong>Associated Customer ID</strong>
+          <span id="profDetailCustomerId">-</span>
+        </div>
+        <div class="profile-row">
+          <strong>Security Status</strong>
+          <span class="badge approved">Active & Verified</span>
+        </div>
+        <div style="margin-top: 24px; text-align: right;">
+          <button class="secondary" onclick="openPage('dashboard')">Return to Dashboard</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ================= MODALS ================= -->
+
+<!-- 1. Add Customer Modal -->
+<div class="modal-backdrop" id="addCustomerModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Register New Customer</h3>
+      <button class="modal-close" onclick="closeModal('addCustomerModal')">✕</button>
+    </div>
+    <form id="addCustomerForm">
+      <div class="field">
+        <label>Full Legal Name *</label>
+        <input id="newCustName" placeholder="e.g. Santhosh Kumar" required>
+      </div>
+      <div class="field">
+        <label>Email Address *</label>
+        <input id="newCustEmail" type="email" placeholder="name@bank.com" required>
+      </div>
+      <div class="field">
+        <label>Phone Number *</label>
+        <input id="newCustPhone" placeholder="10-digit phone" required>
+      </div>
+      <div class="field">
+        <label>Residential Address *</label>
+        <input id="newCustAddress" placeholder="Street, City, Country" required>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+        <button type="button" class="secondary" onclick="closeModal('addCustomerModal')">Cancel</button>
+        <button type="submit" class="primary">Save Customer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 2. Edit Customer Modal -->
+<div class="modal-backdrop" id="editCustomerModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Edit Customer Details</h3>
+      <button class="modal-close" onclick="closeModal('editCustomerModal')">✕</button>
+    </div>
+    <form id="editCustomerForm">
+      <input type="hidden" id="editCustId">
+      <div class="field">
+        <label>Full Legal Name *</label>
+        <input id="editCustName" required>
+      </div>
+      <div class="field">
+        <label>Email Address *</label>
+        <input id="editCustEmail" type="email" required>
+      </div>
+      <div class="field">
+        <label>Phone Number *</label>
+        <input id="editCustPhone" required>
+      </div>
+      <div class="field">
+        <label>Residential Address</label>
+        <input id="editCustAddress">
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+        <button type="button" class="secondary" onclick="closeModal('editCustomerModal')">Cancel</button>
+        <button type="submit" class="primary">Update Customer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 3. Add Account Modal -->
+<div class="modal-backdrop" id="addAccountModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Open Bank Account</h3>
+      <button class="modal-close" onclick="closeModal('addAccountModal')">✕</button>
+    </div>
+    <form id="addAccountForm">
+      <div class="field">
+        <label>Account Holder (Customer) *</label>
+        <select id="newAccCustomer" required>
+          <option value="">Select Customer</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Account Number *</label>
+        <input id="newAccNumber" placeholder="e.g. NOVA-1004521" required>
+      </div>
+      <div class="field">
+        <label>Account Type *</label>
+        <select id="newAccType" required>
+          <option value="SAVINGS">Savings Account</option>
+          <option value="CURRENT">Current Account</option>
+          <option value="SALARY">Salary Account</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Initial Deposit Balance (₹)</label>
+        <input id="newAccBalance" type="number" step="0.01" min="0" placeholder="0.00" value="0.00">
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+        <button type="button" class="secondary" onclick="closeModal('addAccountModal')">Cancel</button>
+        <button type="submit" class="primary">Create Account</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 4. Edit Account Status Modal -->
+<div class="modal-backdrop" id="editAccountModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Update Account Status</h3>
+      <button class="modal-close" onclick="closeModal('editAccountModal')">✕</button>
+    </div>
+    <form id="editAccountForm">
+      <input type="hidden" id="editAccId">
+      <div class="field">
+        <label>Account Number</label>
+        <input id="editAccNumber" disabled style="background:#f8fafc">
+      </div>
+      <div class="field">
+        <label>Account Type</label>
+        <select id="editAccType">
+          <option value="SAVINGS">Savings Account</option>
+          <option value="CURRENT">Current Account</option>
+          <option value="SALARY">Salary Account</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Operating Status *</label>
+        <select id="editAccStatus" required>
+          <option value="ACTIVE">ACTIVE (Normal Operations)</option>
+          <option value="SUSPENDED">SUSPENDED (Debit Freeze)</option>
+          <option value="CLOSED">CLOSED (Account Terminated)</option>
+        </select>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+        <button type="button" class="secondary" onclick="closeModal('editAccountModal')">Cancel</button>
+        <button type="submit" class="primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 5. Add Beneficiary Modal -->
+<div class="modal-backdrop" id="addBeneficiaryModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Add Payee Beneficiary</h3>
+      <button class="modal-close" onclick="closeModal('addBeneficiaryModal')">✕</button>
+    </div>
+    <form id="addBeneficiaryForm">
+      <div class="field" id="benCustomerField">
+        <label>Associated Customer *</label>
+        <select id="newBenCustomer" required>
+          <option value="">Select Customer</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Payee Legal Name *</label>
+        <input id="newBenName" placeholder="e.g. Priya Sharma" required>
+      </div>
+      <div class="field">
+        <label>Account Number *</label>
+        <input id="newBenAccount" placeholder="e.g. 501004512398" required>
+      </div>
+      <div class="field">
+        <label>Bank Name *</label>
+        <input id="newBenBank" placeholder="e.g. HDFC Bank" required>
+      </div>
+      <div class="field">
+        <label>IFSC Code</label>
+        <input id="newBenIfsc" placeholder="e.g. HDFC0001234">
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+        <button type="button" class="secondary" onclick="closeModal('addBeneficiaryModal')">Cancel</button>
+        <button type="submit" class="primary">Add Beneficiary</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 6. Add Consent Modal -->
+<div class="modal-backdrop" id="addConsentModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Request Open Banking Consent</h3>
+      <button class="modal-close" onclick="closeModal('addConsentModal')">✕</button>
+    </div>
+    <form id="addConsentForm">
+      <div class="field" id="consentCustomerField">
+        <label>Customer *</label>
+        <select id="newConsentCustomer" required>
+          <option value="">Select Customer</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Consent Scope / Purpose *</label>
+        <input id="newConsentPurpose" placeholder="e.g. Account Information & Balance Inquiry" required>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+        <button type="button" class="secondary" onclick="closeModal('addConsentModal')">Cancel</button>
+        <button type="submit" class="primary">Submit Consent Request</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 7. Universal Confirmation Modal -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal-box" style="max-width: 420px;">
+    <div class="confirm-box">
+      <div style="font-size: 38px; margin-bottom: 10px;">⚠️</div>
+      <h3 id="confirmTitle">Confirm Action</h3>
+      <p id="confirmMessage">Are you sure you want to proceed with this operation?</p>
+      <div class="confirm-actions">
+        <button type="button" class="secondary" onclick="closeModal('confirmModal')">Cancel</button>
+        <button type="button" class="primary" id="confirmOkBtn" style="background:#dc2626">Delete Record</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Global Toast Notification -->
+<div id="toast" class="toast"></div>
+
+<script src="js/config.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
